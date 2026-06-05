@@ -17,9 +17,22 @@ const pool = new Pool({
 
 let initializationPromise;
 
-async function query(text, params = []) {
+async function rawQuery(text, params = []) {
   const result = await pool.query(text, params);
   return result.rows;
+}
+
+async function query(text, params = [], options = {}) {
+  try {
+    return await rawQuery(text, params);
+  } catch (error) {
+    if (error && error.code === "42P01" && !options.skipAutoInit) {
+      await initializeDatabase();
+      return rawQuery(text, params);
+    }
+
+    throw error;
+  }
 }
 
 async function initializeDatabase() {
@@ -28,7 +41,8 @@ async function initializeDatabase() {
   }
 
   initializationPromise = (async () => {
-  await query(`
+    await query(
+      `
     CREATE TABLE IF NOT EXISTS posts (
       id BIGSERIAL PRIMARY KEY,
       slug TEXT NOT NULL UNIQUE,
@@ -41,9 +55,13 @@ async function initializeDatabase() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
-  `);
+  `,
+      [],
+      { skipAutoInit: true }
+    );
 
-  await query(`
+    await query(
+      `
     CREATE TABLE IF NOT EXISTS comments (
       id BIGSERIAL PRIMARY KEY,
       post_id BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
@@ -52,17 +70,28 @@ async function initializeDatabase() {
       content TEXT NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
-  `);
+  `,
+      [],
+      { skipAutoInit: true }
+    );
 
-  await query(`
+    await query(
+      `
     CREATE INDEX IF NOT EXISTS idx_posts_status_published_at
     ON posts (status, published_at DESC, created_at DESC);
-  `);
+  `,
+      [],
+      { skipAutoInit: true }
+    );
 
-  await query(`
+    await query(
+      `
     CREATE INDEX IF NOT EXISTS idx_comments_post_id_created_at
     ON comments (post_id, created_at DESC);
-  `);
+  `,
+      [],
+      { skipAutoInit: true }
+    );
   })().catch((error) => {
     initializationPromise = null;
     throw error;
