@@ -1,6 +1,6 @@
 # Journal Blog
 
-A lightweight full-stack blog website built with Express, EJS, PostgreSQL, and Render-ready deployment.
+A lightweight full-stack blog website built with Express, EJS, PostgreSQL, and a Vercel-friendly serverless entry.
 
 ## Features
 
@@ -9,6 +9,7 @@ A lightweight full-stack blog website built with Express, EJS, PostgreSQL, and R
 - Accept reader comments on each post
 - Manage posts and delete comments from `/admin`
 - Deploy from GitHub with automatic redeploy on push
+- Use Supabase PostgreSQL for persistent cloud data
 
 ## Stack
 
@@ -16,26 +17,26 @@ A lightweight full-stack blog website built with Express, EJS, PostgreSQL, and R
 - Express
 - EJS templates
 - PostgreSQL
-- Render Blueprint
+- Vercel
+- Supabase
 
 ## Local setup
 
 1. Copy `.env.example` to `.env`
-2. Make sure PostgreSQL is available locally
-3. Update `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`
-4. Install dependencies:
+2. Set `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`
+3. Install dependencies:
 
 ```bash
 npm install
 ```
 
-5. Start the app:
+4. Start the app:
 
 ```bash
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000)
+5. Open [http://localhost:3000](http://localhost:3000)
 
 ## Admin access
 
@@ -43,58 +44,64 @@ npm run dev
 - Use the credentials from `.env`
 - Create a draft or publish directly from the editor
 
-## Render deployment
+## Vercel deployment
 
-This project is prepared for GitHub to Render automatic deployment.
+This project is prepared for GitHub to Vercel deployment.
 
 ### Files already prepared
 
-- `render.yaml`: creates the web service and PostgreSQL database
-- `package.json`: includes the correct build and start commands
+- `api/index.js`: Vercel serverless entry
+- `vercel.json`: rewrites all requests into the Express app and bundles `views` and `public`
+- `src/server.js`: local development entry
 - `src/db.js`: initializes PostgreSQL tables automatically at startup
 
-### What you need to do
+### Step 1: Create a Supabase project
 
-1. Create a GitHub repository
-2. Upload this project to GitHub
-3. Create a Render account and connect GitHub
-4. In Render, choose `New +` -> `Blueprint`
-5. Select this GitHub repository
-6. Render will read `render.yaml` and create:
-   - one web service
-   - one PostgreSQL database
-7. Wait for deployment to finish
-8. Open the generated `onrender.com` domain
+1. Sign in to Supabase
+2. Create a new project
+3. Wait for the database to finish provisioning
+4. Open `Project Settings` -> `Database`
+5. Copy the PostgreSQL connection string
 
-### Important production changes after first deploy
+For Vercel, the pooled connection string is recommended.
 
-After Render creates the service, go to the service environment settings and change:
+### Step 2: Import this repository into Vercel
 
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-- `BASE_URL`
+1. Sign in to Vercel
+2. Click `Add New...` -> `Project`
+3. Import the GitHub repository
+4. Keep the default framework detection as `Other`
+5. Do not change the root directory
 
-Set `BASE_URL` to your real Render address, for example:
+### Step 3: Set environment variables in Vercel
 
-```env
-BASE_URL=https://your-service-name.onrender.com
-```
-
-### Environment variables
+Add these variables before the first deployment:
 
 ```env
-PORT=3000
-BASE_URL=http://localhost
+DATABASE_URL=postgresql://postgres:password@db.example.supabase.co:5432/postgres
 SESSION_SECRET=replace-with-a-long-random-secret
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=change-me-now
-DATABASE_URL=postgresql://journal_blog:journal_blog_password@localhost:5432/journal_blog
-APP_DOMAIN=
+BASE_URL=https://your-project.vercel.app
 ```
+
+Notes:
+
+- `DATABASE_URL`: use the Supabase connection string
+- `SESSION_SECRET`: use a long random value
+- `BASE_URL`: set it to your Vercel production domain
+- `ADMIN_EMAIL` and `ADMIN_PASSWORD`: change them to your own values
+
+### Step 4: Deploy
+
+1. Click `Deploy`
+2. Wait for the first build to finish
+3. Open the generated `vercel.app` domain
+4. Sign in at `/admin/login`
 
 ## Optional Docker deployment
 
-If you want to run it yourself with Docker instead of Render:
+If you want to run it yourself with Docker instead of Vercel:
 
 ```bash
 docker compose up -d --build

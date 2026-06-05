@@ -15,12 +15,19 @@ const pool = new Pool({
     : false
 });
 
+let initializationPromise;
+
 async function query(text, params = []) {
   const result = await pool.query(text, params);
   return result.rows;
 }
 
 async function initializeDatabase() {
+  if (initializationPromise) {
+    return initializationPromise;
+  }
+
+  initializationPromise = (async () => {
   await query(`
     CREATE TABLE IF NOT EXISTS posts (
       id BIGSERIAL PRIMARY KEY,
@@ -56,6 +63,12 @@ async function initializeDatabase() {
     CREATE INDEX IF NOT EXISTS idx_comments_post_id_created_at
     ON comments (post_id, created_at DESC);
   `);
+  })().catch((error) => {
+    initializationPromise = null;
+    throw error;
+  });
+
+  return initializationPromise;
 }
 
 function now() {
