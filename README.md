@@ -1,114 +1,127 @@
 # Journal Blog
 
-A lightweight full-stack blog website built with Express, EJS, PostgreSQL, and a Vercel-friendly serverless entry.
+A GitHub Pages-ready static blog generated from Markdown files.
 
 ## Features
 
-- Create draft posts from the admin dashboard
-- Publish articles to the public homepage
-- Accept reader comments on each post
-- Manage posts and delete comments from `/admin`
-- Deploy from GitHub with automatic redeploy on push
-- Use Supabase PostgreSQL for persistent cloud data
+- Write posts in `Markdown`
+- Generate a static site with a single build command
+- Deploy automatically with GitHub Pages Actions
+- Preview locally with a tiny built-in Node server
+- Add optional comments through Giscus and GitHub Discussions
 
-## Stack
+## Project structure
 
-- Node.js
-- Express
-- EJS templates
-- PostgreSQL
-- Vercel
-- Supabase
+- `content/site.json`: site title, URL, navigation, and comment settings
+- `content/posts/*.md`: blog posts with front matter
+- `scripts/build-static.js`: static site generator
+- `scripts/new-post.js`: helper for creating a new post file
+- `scripts/preview.js`: local preview server for the generated site
+- `.github/workflows/pages.yml`: GitHub Pages deployment workflow
 
-## Local setup
+## Local usage
 
-1. Copy `.env.example` to `.env`
-2. Set `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`
-3. Install dependencies:
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-4. Start the app:
+Create a new post:
 
 ```bash
-npm run dev
+npm run new-post -- "My First Post"
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000)
-
-## Admin access
-
-- Sign in at `/admin/login`
-- Use the credentials from `.env`
-- Create a draft or publish directly from the editor
-
-## Vercel deployment
-
-This project is prepared for GitHub to Vercel deployment.
-
-### Files already prepared
-
-- `api/index.js`: Vercel serverless entry
-- `vercel.json`: rewrites all requests into the Express app and bundles `views` and `public`
-- `src/server.js`: local development entry
-- `src/db.js`: initializes PostgreSQL tables automatically at startup
-
-### Step 1: Create a Supabase project
-
-1. Sign in to Supabase
-2. Create a new project
-3. Wait for the database to finish provisioning
-4. Open `Project Settings` -> `Database`
-5. Copy the PostgreSQL connection string
-
-For Vercel, the pooled connection string is recommended.
-
-### Step 2: Import this repository into Vercel
-
-1. Sign in to Vercel
-2. Click `Add New...` -> `Project`
-3. Import the GitHub repository
-4. Keep the default framework detection as `Other`
-5. Do not change the root directory
-
-### Step 3: Set environment variables in Vercel
-
-Add these variables before the first deployment:
-
-```env
-DATABASE_URL=postgresql://postgres:password@db.example.supabase.co:5432/postgres
-SESSION_SECRET=replace-with-a-long-random-secret
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=change-me-now
-BASE_URL=https://your-project.vercel.app
-```
-
-Notes:
-
-- `DATABASE_URL`: use the Supabase connection string
-- `SESSION_SECRET`: use a long random value
-- `BASE_URL`: set it to your Vercel production domain
-- `ADMIN_EMAIL` and `ADMIN_PASSWORD`: change them to your own values
-
-### Step 4: Deploy
-
-1. Click `Deploy`
-2. Wait for the first build to finish
-3. Open the generated `vercel.app` domain
-4. Sign in at `/admin/login`
-
-## Optional Docker deployment
-
-If you want to run it yourself with Docker instead of Vercel:
+Build the site:
 
 ```bash
-docker compose up -d --build
+npm run build
 ```
 
-This starts:
+Preview the generated site:
 
-- PostgreSQL
-- The blog app
-- Caddy reverse proxy
+```bash
+npm run preview
+```
+
+The preview server reads `basePath` from `content/site.json`, so for this repository the local URL will be:
+
+```text
+http://localhost:3000/journal-blog/
+```
+
+## Writing posts
+
+Each post is a Markdown file inside `content/posts`.
+
+Example front matter:
+
+```md
+---
+title: My First Post
+slug: my-first-post
+date: 2026-06-05
+excerpt: A short summary for the home page.
+coverImage: https://example.com/image.jpg
+tags: notes, personal
+draft: false
+---
+
+## Heading
+
+Write your post content here.
+```
+
+Supported fields:
+
+- `title`: post title
+- `slug`: URL slug
+- `date`: publish date
+- `excerpt`: short card summary
+- `coverImage`: optional cover image URL
+- `tags`: comma-separated tag list
+- `draft`: set to `true` to hide a post from the generated site
+
+## GitHub Pages deployment
+
+1. Push this repository to GitHub.
+2. Open `Settings` -> `Pages`.
+3. Under `Build and deployment`, choose `GitHub Actions`.
+4. Push to `main` and wait for the `Deploy GitHub Pages` workflow to finish.
+5. Open the published URL from the workflow output.
+
+For this repository, the default URL should be similar to:
+
+```text
+https://hnuljy.github.io/journal-blog/
+```
+
+## Site configuration
+
+Update `content/site.json` before publishing:
+
+- `siteUrl`: full published URL ending with `/`
+- `basePath`: repository path, usually `/journal-blog` for a project site
+- `navigation`: links shown in the header
+- `footerText`: footer copy
+
+If you later use a custom domain, update:
+
+- `siteUrl` to the custom domain URL
+- `basePath` to an empty string
+
+## Optional comments with Giscus
+
+This static version does not store comments on the server. To enable comments:
+
+1. Turn on GitHub Discussions in the repository settings.
+2. Open [Giscus](https://giscus.app/).
+3. Fill in the repository details.
+4. Copy the generated values into `content/site.json`.
+5. Set `comments.enabled` to `true`.
+
+## Notes
+
+- The old server-side files remain in the repository, but GitHub Pages only uses the static build generated by `scripts/build-static.js`.
+- Generated output is written to `dist/` and is ignored by Git.

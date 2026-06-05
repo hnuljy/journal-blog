@@ -1,0 +1,40 @@
+{
+  "title": "Journal Blog",
+  "tagline": "Write, publish, and share your ideas.",
+  "description": "A lightweight static blog generated from Markdown and deployed with GitHub Pages.",
+  "siteUrl": "https://hnuljy.github.io/journal-blog/",
+  "basePath": "/journal-blog",
+  "author": {
+    "name": "hnuljy",
+    "email": ""
+  },
+  "navigation": [
+    {
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "label": "Archive",
+      "href": "/#posts"
+    },
+    {
+      "label": "GitHub",
+      "href": "https://github.com/hnuljy/journal-blog"
+    }
+  ],
+  "footerText": "Built with Markdown and GitHub Pages.",
+  "comments": {
+    "provider": "giscus",
+    "enabled": false,
+    "repo": "",
+    "repoId": "",
+    "category": "",
+    "categoryId": "",
+    "mapping": "pathname",
+    "strict": "0",
+    "reactionsEnabled": "1",
+    "emitMetadata": "0",
+    "inputPosition": "top",
+    "theme": "light"
+  }
+}

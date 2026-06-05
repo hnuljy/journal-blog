@@ -1,35 +1,23 @@
 {
   "name": "journal-blog",
-  "version": "1.0.0",
-  "description": "A simple blog with publishing, comments, and Vercel plus Supabase deployment.",
-  "main": "src/server.js",
+  "version": "2.0.0",
+  "private": true,
+  "description": "A GitHub Pages-ready static blog generated from Markdown files.",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
-    "deploy": "docker compose up -d --build"
+    "build": "node scripts/build-static.js",
+    "start": "node scripts/preview.js",
+    "preview": "node scripts/preview.js",
+    "new-post": "node scripts/new-post.js"
   },
   "keywords": [
     "blog",
-    "express",
-    "postgresql",
-    "vercel",
-    "supabase"
+    "markdown",
+    "static-site",
+    "github-pages"
   ],
   "author": "",
   "license": "MIT",
   "engines": {
     "node": ">=20"
-  },
-  "dependencies": {
-    "cookie-session": "^2.1.0",
-    "dotenv": "^16.4.7",
-    "ejs": "^3.1.10",
-    "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0",
-    "helmet": "^8.0.0",
-    "method-override": "^3.0.0",
-    "morgan": "^1.10.0",
-    "pg": "^8.13.3",
-    "sanitize-html": "^2.17.0"
   }
 }
