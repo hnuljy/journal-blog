@@ -1,0 +1,45 @@
+<%- include("partials/header", { pageTitle }) %>
+
+<section class="hero">
+  <p class="eyebrow">Personal publishing</p>
+  <h1>Write, publish, and discuss your ideas.</h1>
+  <p class="hero-copy">
+    Journal Blog is a lightweight blog that supports drafts, publishing, comments,
+    and Docker-based deployment.
+  </p>
+  <% if (isAdmin) { %>
+    <a class="button" href="/admin/posts/new">Write a new post</a>
+  <% } %>
+</section>
+
+<section class="list-section">
+  <div class="section-heading">
+    <h2>Latest posts</h2>
+    <span><%= posts.length %> published</span>
+  </div>
+
+  <% if (!posts.length) { %>
+    <div class="empty-state">
+      <h3>No posts yet</h3>
+      <p>Create your first post from the admin dashboard to start publishing.</p>
+    </div>
+  <% } %>
+
+  <div class="card-grid">
+    <% posts.forEach((post) => { %>
+      <article class="card">
+        <% if (post.cover_image) { %>
+          <img class="cover-image" src="<%= post.cover_image %>" alt="<%= post.title %>" />
+        <% } %>
+        <div class="card-body">
+          <p class="meta"><%= formatDate(post.published_at || post.created_at) %></p>
+          <h3><a href="/posts/<%= post.slug %>"><%= post.title %></a></h3>
+          <p><%= post.excerpt %></p>
+          <a class="text-link" href="/posts/<%= post.slug %>">Read post</a>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<%- include("partials/footer") %>

@@ -1,0 +1,58 @@
+<%- include("partials/header", { pageTitle }) %>
+
+<article class="post-layout">
+  <div class="post-main">
+    <p class="meta"><%= formatDate(post.published_at || post.created_at) %></p>
+    <h1><%= post.title %></h1>
+    <% if (post.cover_image) { %>
+      <img class="post-cover" src="<%= post.cover_image %>" alt="<%= post.title %>" />
+    <% } %>
+    <div class="post-content"><%= post.content %></div>
+  </div>
+
+  <aside class="post-sidebar" id="comments">
+    <section class="comment-box">
+      <h2>Leave a comment</h2>
+      <form action="/posts/<%= post.slug %>/comments" method="post" class="stack-form">
+        <label>
+          <span>Name</span>
+          <input name="authorName" maxlength="80" required />
+        </label>
+        <label>
+          <span>Email</span>
+          <input name="authorEmail" maxlength="120" type="email" />
+        </label>
+        <label>
+          <span>Comment</span>
+          <textarea name="content" maxlength="1500" rows="5" required></textarea>
+        </label>
+        <button class="button" type="submit">Post comment</button>
+      </form>
+    </section>
+
+    <section class="comment-box">
+      <div class="section-heading">
+        <h2>Comments</h2>
+        <span><%= comments.length %></span>
+      </div>
+
+      <% if (!comments.length) { %>
+        <p class="muted">No comments yet. Start the conversation.</p>
+      <% } %>
+
+      <div class="comment-list">
+        <% comments.forEach((comment) => { %>
+          <article class="comment-item">
+            <div class="comment-top">
+              <strong><%= comment.author_name %></strong>
+              <span><%= formatDate(comment.created_at) %></span>
+            </div>
+            <p><%= comment.content %></p>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+  </aside>
+</article>
+
+<%- include("partials/footer") %>

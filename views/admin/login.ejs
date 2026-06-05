@@ -1,0 +1,20 @@
+<%- include("../partials/header", { pageTitle }) %>
+
+<section class="panel narrow">
+  <div class="section-heading">
+    <h1>Admin sign in</h1>
+  </div>
+  <form action="/admin/login" method="post" class="stack-form">
+    <label>
+      <span>Email</span>
+      <input name="email" type="email" required />
+    </label>
+    <label>
+      <span>Password</span>
+      <input name="password" type="password" required />
+    </label>
+    <button class="button" type="submit">Sign in</button>
+  </form>
+</section>
+
+<%- include("../partials/footer") %>
